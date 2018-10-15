@@ -1,5 +1,8 @@
-const pluginName = 'homebridge-smartthing';
-const platformName = 'SmartThings';
+const {
+    pluginName,
+    platformName,
+    knownCapabilities
+} = require("./lib/constants");
 var he_st_api = require('./lib/he_st_api');
 var http = require('http');
 var os = require('os');
@@ -11,25 +14,27 @@ var Service,
 
 module.exports = function(homebridge) {
     console.log("Homebridge Version: " + homebridge.version);
-
-    // Service and Characteristic are from hap-nodejs
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-
-    // Accessory must be created from PlatformAccessory Constructor
     Accessory = homebridge.hap.Accessory;
     uuid = homebridge.hap.uuid;
-    HE_ST_Accessory = require('./accessories/he_st_accessories')(Accessory, Service, Characteristic, uuid, platformName);
-    // For platform plugin to be considered as dynamic platform plugin,
-    // registerPlatform(pluginName, platformName, constructor, dynamic), dynamic must be true
+    HE_ST_Accessory = require('./devices/he_st_accessories')(Accessory, Service, Characteristic, uuid, platformName);
     homebridge.registerPlatform(pluginName, platformName, HE_ST_Platform);
 };
 
-// Platform constructor
-// config may be null
-// api may be null if launched from old homebridge version
 function HE_ST_Platform(log, config) {
     // Load Wink Authentication From Config File
+    if (!config) {
+        log("Plugin not configured.");
+        return;
+    }
+    this.config = config;
+    // this.api = he_st_api;
+    this.log = log;
+    this.deviceLookup = {};
+    this.firstpoll = true;
+    this.attributeLookup = {};
+
     this.temperature_unit = 'F';
 
     this.app_url = config['app_url'];
@@ -70,38 +75,7 @@ function HE_ST_Platform(log, config) {
     if (this.direct_ip === undefined || this.direct_ip === '') {
         this.direct_ip = getIPAddress();
     }
-    this.config = config;
-    this.api = he_st_api;
-    this.log = log;
-    this.deviceLookup = {};
-    this.firstpoll = true;
-    this.attributeLookup = {};
 }
-
-// HE_ST_Platform.prototype.addAttributeUsage = function(attribute, deviceid, mycharacteristic) {
-//     if (!this.attributeLookup[deviceid])
-//         this.attributeLookup[deviceid] = {};
-//     if (!this.attributeLookup[deviceid][attribute])
-//         this.attributeLookup[deviceid][attribute] = [];
-//     this.attributeLookup[deviceid][attribute].push(mycharacteristic);
-// };
-
-// HE_ST_Platform.prototype.getaddService = function(Accessory, Service) {
-//     var myService = Accessory.getService(Service);
-//     if (!myService) myService = Accessory.addService(Service);
-//     return myService;
-// };
-// HE_ST_Platform.prototype.getaddCharacteristic = function(Accessory, Service, Characteristic) {
-//     var myService = this.getaddService(Accessory, Service);
-//     var myCharacteristic = myService.getCharacteristic(Characteristic);
-//     if (!myCharacteristic) myCharacteristic = myService.addCharacteristic(Characteristic);
-//     return myCharacteristic;
-// };
-
-// Sample function to show how developer can add accessory dynamically from outside event
-// HE_ST_Platform.prototype.addAccessory = function(device) {
-//     this.addAccessoryCharacteristics(this.accessories_configured[device.uuid], device);
-// };
 
 HE_ST_Platform.prototype = {
     reloadData: function(callback) {
@@ -164,60 +138,7 @@ HE_ST_Platform.prototype = {
         // var foundAccessories = [];
         this.deviceLookup = [];
         this.unknownCapabilities = [];
-        this.knownCapabilities = [
-            'Switch',
-            'Light',
-            'LightBulb',
-            'Bulb',
-            'Color Control',
-            'Door',
-            'Window',
-            'Battery',
-            'Polling',
-            'Lock',
-            'Refresh',
-            'Lock Codes',
-            'Sensor',
-            'Actuator',
-            'Configuration',
-            'Switch Level',
-            'Temperature Measurement',
-            'Motion Sensor',
-            'Color Temperature',
-            'Illuminance Measurement',
-            'Contact Sensor',
-            'Acceleration Sensor',
-            'Door Control',
-            'Garage Door Control',
-            'Relative Humidity Measurement',
-            'Presence Sensor',
-            'Carbon Dioxide Measurement',
-            'Carbon Monoxide Detector',
-            'Water Sensor',
-            'Window Shade',
-            'Valve',
-            'Energy Meter',
-            'Power Meter',
-            'Thermostat',
-            'Thermostat Cooling Setpoint',
-            'Thermostat Mode',
-            'Thermostat Fan Mode',
-            'Thermostat Operating State',
-            'Thermostat Heating Setpoint',
-            'Thermostat Setpoint',
-            'Fan Speed',
-            'Fan Control',
-            'Fan Light',
-            'Fan',
-            'Speaker',
-            'Tamper Alert',
-            'Alarm',
-            'Alarm System Status',
-            'AlarmSystemStatus',
-            'Mode',
-            'Routine',
-            'Button'
-        ];
+        this.knownCapabilities = knownCapabilities;
         if (platformName === 'Hubitat' || platformName === 'hubitat') {
             let newList = [];
             for (const item in this.knownCapabilities) {
