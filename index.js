@@ -4,7 +4,7 @@ const pluginName = globals.pluginName;
 const platformName = globals.platformName;
 const knownCapabilities = globals.knownCapabilities;
 
-const MyPlatform = require("./MyPlatform");
+const MyPlatform = require("./myPlatform");
 console.log('platformName: ' + platformName);
 console.log('pluginName: ' + pluginName);
 

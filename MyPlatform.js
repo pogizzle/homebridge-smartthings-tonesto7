@@ -5,9 +5,9 @@ const {
 } = require("./constants");
 const http = require('http');
 const os = require('os');
-var myClientApi = require('./lib/myClientApi');
-var MyAccessory = require('./devices/MyAccessory');
-
+var ClientApi = require('./lib/myClientApi');
+var Accessory = require('./devices/MyAccessory');
+var myAccessory, myClientApi;
 module.exports = class MyPlatform {
     constructor(log, config, api) {
         if (!config) {
@@ -24,8 +24,8 @@ module.exports = class MyPlatform {
 
         this.temperature_unit = 'F';
 
-        myClientApi = new myClientApi(this.config, this.log);
-        MyAccessory = new MyAccessory(this.api.Accessory, this.api.Service, this.api.Characteristic, this.api.uuid);
+        myClientApi = new ClientApi(this.config, this.log);
+        myAccessory = new Accessory(this.api.Accessory, this.api.Service, this.api.Characteristic, this.api.uuid);
 
         this.app_url = config['app_url'];
         this.app_id = config['app_id'];
