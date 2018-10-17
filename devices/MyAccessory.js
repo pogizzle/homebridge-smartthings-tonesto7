@@ -20,7 +20,6 @@ module.exports = function(oAccessory, oService, oCharacteristic, ouuid) {
     }
     return MyAccessory;
 };
-module.exports.MyAccessory = MyAccessory;
 
 function toTitleCase(str) {
     return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
