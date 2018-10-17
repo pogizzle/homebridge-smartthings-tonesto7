@@ -5,8 +5,6 @@ const platformName = globals.platformName;
 const knownCapabilities = globals.knownCapabilities;
 
 const MyPlatform = require("./myPlatform");
-console.log('platformName: ' + platformName);
-console.log('pluginName: ' + pluginName);
 
 module.exports = function(homebridge) {
     console.log("Homebridge Version: " + homebridge.version);

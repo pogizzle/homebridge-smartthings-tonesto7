@@ -5,9 +5,9 @@ const {
 } = require("./constants");
 const http = require('http');
 const os = require('os');
-var ClientApi = require('./lib/myClientApi');
+const myClientApi = require('./lib/myClientApi');
 var Accessory = require('./devices/MyAccessory');
-var myAccessory, myClientApi;
+var myAccessory;
 module.exports = class MyPlatform {
     constructor(log, config, api) {
         if (!config) {
@@ -23,9 +23,6 @@ module.exports = class MyPlatform {
         this.attributeLookup = {};
 
         this.temperature_unit = 'F';
-
-        myClientApi = new ClientApi(this.config, this.log);
-        myAccessory = new Accessory(this.api.Accessory, this.api.Service, this.api.Characteristic, this.api.uuid);
 
         this.app_url = config['app_url'];
         this.app_id = config['app_id'];
@@ -65,6 +62,7 @@ module.exports = class MyPlatform {
         if (this.direct_ip === undefined || this.direct_ip === '') {
             this.direct_ip = getIPAddress();
         }
+        myAccessory = new Accessory(this.api.Accessory, this.api.Service, this.api.Characteristic, this.api.uuid);
     }
     reloadData(callback) {
         var that = this;
@@ -84,7 +82,7 @@ module.exports = class MyPlatform {
                             accessory = that.deviceLookup[device.deviceid];
                             accessory.loadData(devices[i]);
                         } else {
-                            accessory = new MyAccessory(that, device);
+                            accessory = new myAccessory(that, device);
                             // that.log(accessory);
                             if (accessory !== undefined) {
                                 if (accessory.services.length <= 1 || accessory.deviceGroup === 'unknown') {
