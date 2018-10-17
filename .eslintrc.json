@@ -1,4 +1,9 @@
 {
+    "root": true,
+    "extends": [
+        "eslint:recommended",
+        "prettier"
+    ],
     "env": {
         "browser": false,
         "commonjs": true,
@@ -9,11 +14,13 @@
         "ecmaFeatures": {
             "jsx": true
         },
+        "ecmaVersion": 9,
         "sourceType": "module"
     },
     "rules": {
         "semi": "error",
         "eqeqeq": "error",
+        "no-console": "warn",
         "no-const-assign": "warn",
         "no-this-before-super": "warn",
         "no-undef": "warn",

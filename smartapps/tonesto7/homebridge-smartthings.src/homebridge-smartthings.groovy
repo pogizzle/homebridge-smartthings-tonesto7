@@ -5,7 +5,7 @@
  */
 
 String appVersion() { return "1.5.0" }
-String appModified() { return "10-12-2018" }
+String appModified() { return "10-14-2018" }
 String platform() { return "SmartThings" }
 String appIconUrl() { return "https://raw.githubusercontent.com/tonesto7/homebridge-smartthings-tonesto7/master/images/hb_tonesto7@2x.png" }
 String getAppImg(imgName) { return "https://raw.githubusercontent.com/tonesto7/smartthings-tonesto7-public/master/resources/icons/$imgName" }
@@ -72,7 +72,7 @@ def mainPage() {
             section("Restrict Temp Device Creation") {
                 input "noTemp", "bool", title: "Remove Temp from Contacts and Water Sensors?", required: false, defaultValue: false, submitOnChange: true
                 if(settings?.noTemp) {
-                    input "sensorAllowTemp", "capability.sensor", title: "Allow Temp on these Sensors", multiple: true, submitOnChange: true, required: false, image: getAppImg("temperature.png")
+                    input "sensorAllowTemp", "capability.sensor", title: "Except for these Sensors", multiple: true, submitOnChange: true, required: false, image: getAppImg("temperature.png")
                 }
             }
             section("Create Devices for Modes in HomeKit?") {
@@ -86,7 +86,7 @@ def mainPage() {
                 input "routineList", "enum", title: "Create Devices for these Routines", required: false, multiple: true, options: routines, submitOnChange: true, image: getAppImg("routine.png")
             }
             section("Smart Home Monitor Support (SHM):") {
-                input "addSecurityDevice", "bool", title: "Allow SHM Control in HomeKit?", required: false, defaultValue: true, submitOnChange: true, image: getAppImg("alarm_home.png")
+                input "addSecurityDevice", "bool", title: "Allow SHM Control in HomeKit?", required: false, defaultValue: false, submitOnChange: true, image: getAppImg("alarm_home.png")
             }
             section("Review Configuration:") {
                 href url: getAppEndpointUrl("config"), style: "embedded", required: false, title: "View the Configuration Data for Homebridge", description: "Tap, select, copy, then click \"Done\""
@@ -117,7 +117,7 @@ def mainPage() {
             section(sectionTitleStr("Restrict Temp Device Creation")) {
                 input "noTemp", "bool", title: inputTitleStr("Remove Temp from Contacts and Water Sensors?"), required: false, defaultValue: false, submitOnChange: true
                 if(settings?.noTemp) {
-                    input "sensorAllowTemp", "capability.sensor", title: inputTitleStr("Allow Temp on these Sensors"), multiple: true, submitOnChange: true, required: false
+                    input "sensorAllowTemp", "capability.sensor", title: inputTitleStr("Except for these Sensors"), multiple: true, submitOnChange: true, required: false
                 }
             }
             section("</br>${sectionTitleStr("Create Mode Devices in HomeKit?")}") {
@@ -406,7 +406,7 @@ def renderConfig() {
             ]
         ]
     ]
-    if(isST()) { jsonMap?.platforms["app_id"] = app.id }
+    if(isST()) { jsonMap?.platforms[0]["app_id"] = app?.id as String }
     def configJson = new groovy.json.JsonOutput().toJson(jsonMap)
     def configString = new groovy.json.JsonOutput().prettyPrint(configJson)
     render contentType: "text/plain", data: configString
